@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+@theme {
+  /* Wit/mintgroen — helder en fris, bewust geen crème/zand */
+  --color-background:   #FFFFFF;
+  --color-surface:      #FFFFFF;
+  --color-surface-2:    #EAF5EC;
+  --color-surface-3:    #DCEEDF;
+  --color-line:         #DCE8DD;
+  --color-line-strong:  #C3D9C7;
+
+  /* Bosgroen — tekst, structuur, donkere secties */
+  --color-foreground:   #1E3F2C;
+  --color-muted:        #4F6E5B;
+  --color-subtle:       #86A390;
+
+  --color-green-100:    #B9DCC3;
+  --color-green-200:    #8FC49F;
+  --color-green-300:    #57A874;
+  --color-green-400:    #2E8B57;
+  --color-accent:       #2E8B57;
+  --color-accent-dark:  #206B41;
+  --color-accent-dim:   #DFF1E5;
+
+  --color-dark:         #173824;
+  --color-on-dark:      #F3F7F0;
+  --color-on-dark-muted: #C9DDC9;
+  --color-on-dark-soft: #8FC49F;
+
+  /* Zonlicht-geel — vrolijk accent (CTA's, highlights), vervangt de eerdere klei-tint */
+  --color-clay:         #B8873D;
+  --color-clay-dark:    #93692C;
+  --color-clay-dim:     #EDE1C5;
+
+  --font-display: var(--font-fraunces), 'Fraunces', serif;
+  --font-body:    var(--font-inter), 'Inter', sans-serif;
+  --font-logo:    var(--font-ovo), 'Ovo', serif;
+  --font-hero:    var(--font-yeseva), 'Yeseva One', serif;
+  --radius-sm:   6px;
+  --radius-md:   12px;
+  --radius-lg:   20px;
+  --radius-xl:   32px;
+  --radius-full: 9999px;
+}
+
+/* ── Base ───────────────────────────────────────────────────── */
+html {
+  scroll-behavior: auto; /* Lenis handelt smooth scroll af */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-body);
+}
+
+::selection { background-color: var(--color-accent-dim); }
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--color-background); }
+::-webkit-scrollbar-thumb { background: var(--color-line-strong); border-radius: 3px; }
+
+/* ── Scroll-triggered reveal ───────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-line {
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-line.in-view { transform: scaleY(1); }
+
+/* ── Reduced motion ──────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

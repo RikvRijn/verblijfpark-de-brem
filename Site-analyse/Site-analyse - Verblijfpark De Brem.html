@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Site-analyse Verblijfpark De Brem</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --navy: #0e1624; --navy-light: #172035; --navy-mid: #1e2d47;
+      --blue: #1e6bf1; --blue-light: #4a8dff;
+      --amber: #f59e0b; --green: #22c55e; --red: #ef4444;
+      --text: #f1f5f9; --text-muted: #94a3b8; --border: #2c3f62;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--navy); color: var(--text); font-size: 13px; line-height: 1.6; }
+
+    .cover { min-height: 100vh; background: var(--navy); display: flex; flex-direction: column; justify-content: space-between; padding: 48px 56px; page-break-after: always; position: relative; overflow: hidden; }
+    .cover::before { content:''; position:absolute; top:-120px; right:-120px; width:500px; height:500px; border-radius:50%; background:radial-gradient(circle,rgba(30,107,241,.18) 0%,transparent 70%); }
+    .cover::after  { content:''; position:absolute; bottom:-80px; right:-60px; width:350px; height:350px; border-radius:50%; background:radial-gradient(circle,rgba(30,107,241,.10) 0%,transparent 70%); }
+    .cover-body { position:relative; z-index:1; }
+    .cover-title { font-size:46px; font-weight:800; line-height:1.15; color:var(--text); margin-bottom:36px; }
+    .cover-sub { font-size:15px; color:var(--text-muted); margin-bottom:36px; max-width:460px; line-height:1.7; }
+    .cover-meta { border-left:3px solid var(--blue); padding-left:20px; display:grid; gap:12px; }
+    .cover-meta-row { display:flex; flex-direction:column; gap:2px; }
+    .meta-label { font-size:10px; text-transform:uppercase; letter-spacing:.12em; color:var(--text-muted); }
+    .meta-value { font-size:13px; font-weight:600; color:var(--text); }
+
+    .page { max-width:860px; margin:0 auto; padding:36px 64px; page-break-after:always; }
+    .page-header { display:flex; justify-content:flex-end; align-items:flex-start; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:24px; }
+    .page-meta { text-align:right; font-size:11px; color:var(--text-muted); line-height:1.8; }
+    .page-footer { margin-top:28px; padding-top:12px; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:10px; color:var(--text-muted); }
+
+    .section-num { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.18em; color:var(--blue); margin-bottom:4px; }
+    .section-title { font-size:24px; font-weight:800; color:var(--text); margin-bottom:16px; border-bottom:2px solid var(--border); padding-bottom:10px; }
+    .subhead { font-size:14px; font-weight:700; color:var(--text); margin:20px 0 8px; }
+    p.body-text { font-size:12px; color:var(--text-muted); line-height:1.7; margin-bottom:10px; }
+    ul.plain { margin:0 0 12px 18px; }
+    ul.plain li { font-size:12px; color:var(--text-muted); line-height:1.8; }
+    ul.plain li b, ul.plain li strong { color:var(--text); }
+
+    .summary-box { background:var(--navy-light); border-left:4px solid var(--blue); border-radius:4px; padding:14px 18px; font-size:12px; color:var(--text-muted); line-height:1.7; margin-bottom:14px; }
+    .note-box { background:var(--navy-light); border-left:4px solid var(--text-muted); border-radius:4px; padding:12px 16px; font-size:11px; color:var(--text-muted); line-height:1.6; margin-top:12px; }
+    .warn-box { background:rgba(245,158,11,.08); border-left:4px solid var(--amber); border-radius:4px; padding:12px 16px; font-size:11px; color:var(--text-muted); line-height:1.6; margin-top:12px; }
+
+    .status-table { width:100%; border-collapse:collapse; margin:12px 0; }
+    .status-table th { font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--text-muted); background:var(--navy-mid); padding:8px 12px; text-align:left; font-weight:600; }
+    .status-table td { padding:9px 12px; font-size:12px; color:var(--text-muted); border-bottom:1px solid var(--border); vertical-align:top; }
+    .status-table tr:last-child td { border-bottom:none; }
+    .status-table td:first-child { color:var(--text); font-weight:600; width:220px; }
+    .dot { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:7px; }
+    .dot-green { background:var(--green); } .dot-amber { background:var(--amber); } .dot-red { background:var(--red); }
+
+    .spec-table { width:100%; border-collapse:collapse; margin:10px 0 16px; }
+    .spec-table th { font-size:10px; text-transform:uppercase; letter-spacing:.08em; color:var(--text-muted); background:var(--navy-mid); padding:7px 10px; text-align:left; font-weight:600; }
+    .spec-table td { padding:8px 10px; font-size:11.5px; color:var(--text-muted); border-bottom:1px solid var(--border); }
+    .spec-table tr:last-child td { border-bottom:none; }
+    .spec-table td:first-child { color:var(--text); font-weight:600; }
+
+    .qa-item { display:flex; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+    .qa-item:last-child { border-bottom:none; }
+    .qa-num { font-weight:800; color:var(--blue); font-size:13px; min-width:20px; }
+    .qa-text { font-size:12px; color:var(--text-muted); line-height:1.6; }
+    .qa-text b { color:var(--text); }
+
+    .phase { display:flex; gap:14px; padding:12px 0; border-bottom:1px solid var(--border); }
+    .phase:last-child { border-bottom:none; }
+    .phase-num { font-size:20px; font-weight:800; color:var(--blue); min-width:32px; }
+    .phase-title { font-size:13px; font-weight:700; color:var(--text); margin-bottom:3px; }
+    .phase-body { font-size:11.5px; color:var(--text-muted); line-height:1.6; }
+
+    @page { size: A4; margin: 0; }
+    @media print {
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }
+      html, body { width: 210mm; margin: 0; padding: 0; background: #0e1624; }
+      .cover { width: 210mm; min-height: 297mm; max-width: 100%; page-break-after: always; break-after: page; margin: 0; }
+      .page { width: 210mm; min-height: 297mm; max-width: 100%; page-break-after: always; break-after: page; margin: 0 auto; padding: 28px 48px; background: #0e1624; }
+      .status-table tr, .phase, .qa-item { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-body">
+    <div class="cover-title">Site-analyse &amp;<br>contentinventaris</div>
+    <div class="cover-sub">Onderzoek van de huidige website als uitgangspunt voor de nieuwe site onder de naam Verblijfpark De Brem — indeling, content, techniek en aandachtspunten.</div>
+    <div class="cover-meta">
+      <div class="cover-meta-row"><span class="meta-label">Opgesteld voor</span><span class="meta-value">Verblijfpark De Brem</span></div>
+      <div class="cover-meta-row"><span class="meta-label">Huidige website</span><span class="meta-value">verblijfparkdebrem.be</span></div>
+      <div class="cover-meta-row"><span class="meta-label">Datum</span><span class="meta-value">8 september 2026</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- P2 — CONTEXT & UITGANGSPUNTEN -->
+<div class="page">
+  <div class="page-header"><div class="page-meta">Site-analyse Verblijfpark De Brem<br>8 september 2026</div></div>
+  <div class="section-num">01</div>
+  <div class="section-title">Context &amp; uitgangspunten</div>
+
+  <div class="summary-box">
+    De huidige site draait onder de naam <b>"Parador De Brem"</b>, als onderdeel van de Belgische parkengroep
+    <b>Parador Parcs</b> (paradorvakantieparken.be) — te zien aan het logo, de "Terug naar Parador Parcs"-knop en de
+    footer-copyright "© 2026 Parador Parcs". Het park zelf heet volgens de plattegrond-PDF op de site officieel
+    <b>"Vakantie &amp; Verblijfpark De Brem***"</b> (3-sterrenpark). Onze klant heeft dit park overgenomen en gaat
+    zelfstandig verder onder de naam <b>Verblijfpark De Brem</b>, met een nieuwe huisstijl, los van de Parador-branding.
+  </div>
+
+  <div class="subhead">Wat blijft gelijk</div>
+  <ul class="plain">
+    <li>Bedrijfsvoering, locatie en accommodaties blijven ongewijzigd</li>
+    <li>Indeling/structuur van de huidige site wordt als uitgangspunt aangehouden (bevestigd door klant)</li>
+    <li>Reserveringssysteem <b>Recranet</b> blijft het boekingssysteem</li>
+  </ul>
+
+  <div class="subhead">Wat verandert</div>
+  <ul class="plain">
+    <li>Nieuwe naam/merk: <b>Verblijfpark De Brem</b>, losgekoppeld van Parador Parcs</li>
+    <li>Nieuwe huisstijl (kleuren, typografie, logo) — huidige site is Parador-geel/-blauw met een palmboom-in-zon-logo, dit is Parador-huisstijl en niet herbruikbaar</li>
+    <li>Technisch fundament: nieuwe site op de standaardstack (Next.js/Tailwind), Recranet-koppeling opnieuw op te zetten</li>
+  </ul>
+
+  <div class="note-box">
+    Werkwijze van dit document: de huidige site is onderzocht via de live pagina's (homepage, Tijdelijke woonruimte,
+    Over het park, Plattegrond, Faciliteiten, Contact, Boeken), de broncode van de homepage, en de HTTP-response
+    headers. Er is geen toegang tot een CMS-backend, analytics-account of Recranet-beheeromgeving — bevindingen
+    daarover zijn gebaseerd op wat publiek zichtbaar is en expliciet als zodanig gemarkeerd.
+  </div>
+
+  <div class="page-footer"><span>Site-analyse Verblijfpark De Brem</span><span>Pagina 2</span></div>
+</div>
+
+<!-- P3 — SITESTRUCTUUR -->
+<div class="page">
+  <div class="page-header"><div class="page-meta">Site-analyse Verblijfpark De Brem<br>8 september 2026</div></div>
+  <div class="section-num">02</div>
+  <div class="section-title">Sitestructuur van de huidige website</div>
+
+  <div class="subhead">Navigatie</div>
+  <ul class="plain">
+    <li><b>Tijdelijke woonruimte</b> — /nl/tijdelijke-woonruimte</li>
+    <li><b>Over het park</b> — /nl/over-het-park, met submenu <b>Plattegrond</b> en <b>Faciliteiten</b></li>
+    <li><b>Contact</b> — /nl/contact</li>
+    <li><b>Boek direct</b> (knop in header) — /nl/boeken, doorschakeling naar de Recranet-boekingsmodule</li>
+    <li>Taalwissel <b>NL / DE / FR</b> rechtsboven</li>
+    <li>Footer: algemene voorwaarden, privacyverklaring, disclaimer, algemene verkoopsvoorwaarden, nieuwsbrief-opt-in</li>
+  </ul>
+
+  <div class="subhead">Homepage-opbouw (indeling die we als uitgangspunt aanhouden)</div>
+  <ul class="plain">
+    <li>Header met logo, navigatie, "Boek direct"-knop, taalkeuze</li>
+    <li>Volledige-breedte herofoto met paginatitel, direct daaronder een zoekbalk-widget (accommodatietype / data / gasten) die naar Recranet zoekt</li>
+    <li>Rij met 3 iconen + korte USP's ("Tijdelijke woonruimtes", "Centrale ligging", "Compleet ingerichte chalets")</li>
+    <li>Introductietekst-blok met titel, alinea en CTA-knop</li>
+    <li>3-koloms fotoblok ("Wat De Brem te bieden heeft") met linkjes naar subpagina's, CTA naar boekingspagina</li>
+    <li>Footer met contactgegevens, nieuwsbrief-opt-in, partnerlogo's, betaalmethode-iconen</li>
+  </ul>
+
+  <div class="subhead">Contentpagina's</div>
+  <ul class="plain">
+    <li><b>Over het park</b>: fotogalerij + tekst over de ligging bij Turnhout, sfeerimpressie-sectie met fotogalerij, "Ontdek omgeving Turnhout" met 3 uitstapjes (Mega Speelstad Wechelderzande, Dagje Turnhout, Wandelen en fietsen), en een lege/onafgemaakte sectie "In een groene omgeving" onderaan — <b>bug op de huidige site</b>, geen content geladen</li>
+    <li><b>Plattegrond</b>: los ingesloten PDF/afbeelding van de parkplattegrond met legenda</li>
+    <li><b>Faciliteiten</b>: doorlopende tekst, geen visuele iconen/kaarten per faciliteit</li>
+    <li><b>Contact</b>: adres, telefoon, e-mail, contactformulier (naam/e-mail/bericht) — geen kaart, geen openingstijden vermeld</li>
+    <li><b>Boeken</b>: volledige Recranet-zoekresultatenpagina met filters, ingebed in de eigen site-vormgeving (zie sectie 4)</li>
+  </ul>
+
+  <div class="page-footer"><span>Site-analyse Verblijfpark De Brem</span><span>Pagina 3</span></div>
+</div>
+
+<!-- P4 — CONTENT-INVENTARIS -->
+<div class="page">
+  <div class="page-header"><div class="page-meta">Site-analyse Verblijfpark De Brem<br>8 september 2026</div></div>
+  <div class="section-num">03</div>
+  <div class="section-title">Content-inventaris</div>
+
+  <div class="subhead">Contactgegevens (bevestigd van de live site)</div>
+  <table class="spec-table">
+    <tr><td>Adres</td><td>Poeyelheide z/n, 2275 Lille, België</td></tr>
+    <tr><td>Telefoon</td><td>+32 (0)14 88 02 14</td></tr>
+    <tr><td>E-mail</td><td>info@verblijfparkdebrem.be</td></tr>
+    <tr><td>Openingstijden</td><td>Niet vermeld op de huidige site — <b>input nodig</b></td></tr>
+  </table>
+
+  <div class="subhead">Positionering huidige site</div>
+  <p class="body-text">
+    De site richt zich nadrukkelijk op <b>tijdelijke huisvesting</b>: mensen die verhuizen of verbouwen, én
+    bedrijven die op zoek zijn naar <b>werknemershuisvesting</b>. De centrale ligging tussen Antwerpen, Turnhout
+    en de Nederlandse grens wordt als belangrijk verkoopargument gebruikt. Dit is een andere invalshoek dan een
+    "gewoon" vakantiepark — <b>te bevestigen met de klant of deze positionering (tijdelijk wonen + zakelijke
+    huisvesting) wordt voortgezet</b>, of dat de nieuwe site zich meer op reguliere vakantieverhuur richt.
+  </p>
+
+  <div class="subhead">Accommodaties (uit de boekingsmodule, 4 types gevonden)</div>
+  <table class="spec-table">
+    <tr><th>Type</th><th>Capaciteit</th><th>Vanaf-prijs (voorbeeld)</th></tr>
+    <tr><td>Comforthome 4 pers. — max. 1 huisdier</td><td>4 personen</td><td>€ 1.226,50 *</td></tr>
+    <tr><td>Comforthome 4 pers. — zonder huisdieren</td><td>4 personen</td><td>€ 1.226,50 * (9 beoordelingen, 9,2 "Fantastisch")</td></tr>
+    <tr><td>Comforthome 6 pers. — max. 1 huisdier</td><td>6 personen</td><td>niet getoond bij steekproef</td></tr>
+    <tr><td>Comforthome 6 pers. — zonder huisdieren</td><td>6 personen</td><td>niet getoond bij steekproef</td></tr>
+  </table>
+  <p class="body-text">* Prijs zoals getoond voor een specifieke periode (10–24 september 2026), incl. toeslagen. Dit is een
+  <b>voorbeeldprijs uit een dynamisch prijssysteem</b>, geen vast tarief — voor de nieuwe site prijzen altijd live
+  uit Recranet tonen, nooit hardcoden.</p>
+
+  <div class="subhead">Faciliteiten (van de Faciliteiten-pagina)</div>
+  <ul class="plain">
+    <li>Sanitair blok met wasserette</li>
+    <li>Chemisch lozingspunt</li>
+    <li>Containerpark</li>
+    <li>Petanquebanen</li>
+    <li>Speeltuin</li>
+  </ul>
+  <div class="warn-box">
+    <b>Inconsistentie gevonden:</b> de plattegrond-legenda toont ook een <b>cafetaria</b> en <b>terras</b> op het
+    park, die nergens op de Faciliteiten-pagina worden genoemd. Navragen bij de klant of deze nog bestaan/actief zijn.
+  </div>
+
+  <div class="page-footer"><span>Site-analyse Verblijfpark De Brem</span><span>Pagina 4</span></div>
+</div>
+
+<!-- P5 — RECRANET -->
+<div class="page">
+  <div class="page-header"><div class="page-meta">Site-analyse Verblijfpark De Brem<br>8 september 2026</div></div>
+  <div class="section-num">04</div>
+  <div class="section-title">De Recranet-boekingskoppeling</div>
+
+  <p class="body-text">
+    Recranet is het reserveringssysteem — bevestigd via de footer ("Reserveringssysteem vakantieparken: Recranet")
+    op elke pagina. De boekingspagina (/nl/boeken) toont een volledig zoek- en filterscherm (accommodatietype,
+    data, gasten, en voorzieningen-filters als keuken, badkamer, toegankelijkheid, huisdieren) met resultaatkaarten
+    inclusief foto, prijs, capaciteit en een "Boek nu"-knop per accommodatie.
+  </p>
+
+  <div class="summary-box">
+    In de broncode van de boekingspagina is <b>geen zichtbare &lt;iframe&gt;</b> naar een extern Recranet-domein
+    aangetroffen — de pagina laadt op het eigen domein (verblijfparkdebrem.be/nl/boeken/) en oogt volledig in de
+    eigen huisstijl. Dat wijst op een van twee dingen: (1) een API-koppeling waarbij de huidige site zelf de
+    Recranet-data ophaalt en in eigen templates rendert, of (2) een whitelabel/proxy-embed die van buitenaf niet
+    als iframe herkenbaar is. Dit kon niet met zekerheid worden vastgesteld zonder toegang tot de broncode/het
+    CMS.
+  </div>
+
+  <div class="subhead">Actiepunt voor de nieuwe site</div>
+  <ul class="plain">
+    <li>Navragen bij Recranet welke integratieopties zij bieden voor een Next.js-site: REST/JSON-API, embeddable widget, of alleen iframe/redirect</li>
+    <li>Navragen of de huidige Recranet-accountgegevens/API-key overgezet kunnen worden naar de klant, of dat er een nieuw contract/koppeling nodig is na de overname</li>
+    <li>Bepalen of we de boekingsflow zelf in de huisstijl bouwen (API) of doorlinken naar een Recranet-omgeving — dit bepaalt mede de techniekkeuze voor dat onderdeel</li>
+  </ul>
+
+  <div class="page-footer"><span>Site-analyse Verblijfpark De Brem</span><span>Pagina 5</span></div>
+</div>
+
+<!-- P6 — TECHNISCHE SEO QUICK-SCAN -->
+<div class="page">
+  <div class="page-header"><div class="page-meta">Site-analyse Verblijfpark De Brem<br>8 september 2026</div></div>
+  <div class="section-num">05</div>
+  <div class="section-title">Technische quick-scan huidige site</div>
+  <p class="body-text">Geen volledige Lighthouse/PageSpeed-meting uitgevoerd — dit is een inschatting op basis van de broncode en HTTP-response, geen officiële meting.</p>
+
+  <table class="status-table">
+    <tr><td><span class="dot dot-green"></span>Server response</td><td>Snel: TTFB ≈ 300ms, LiteSpeed-hosting</td></tr>
+    <tr><td><span class="dot dot-green"></span>Sitemap.xml</td><td>Aanwezig en bereikbaar (HTTP 200)</td></tr>
+    <tr><td><span class="dot dot-green"></span>H1-structuur</td><td>Homepage heeft een correcte, unieke H1 ("Verblijfpark De Brem in Lille")</td></tr>
+    <tr><td><span class="dot dot-amber"></span>Title-tag</td><td>Aanwezig, maar merknaam-inconsistent: title zegt "Parador De Brem", H1 zegt "Verblijfpark De Brem" — verwarrend voor zoekmachines en gebruikers, sowieso te vervangen bij de rebranding</td></tr>
+    <tr><td><span class="dot dot-red"></span>Meta description</td><td>Leeg op de homepage (content="")</td></tr>
+    <tr><td><span class="dot dot-red"></span>Open Graph-tags</td><td>Niet aangetroffen — geen preview bij het delen van links op social media</td></tr>
+    <tr><td><span class="dot dot-red"></span>Structured data (JSON-LD)</td><td>Niet aangetroffen — geen LodgingBusiness/Campground-schema</td></tr>
+    <tr><td><span class="dot dot-red"></span>Canonical URL</td><td>Niet aangetroffen op de homepage</td></tr>
+    <tr><td><span class="dot dot-red"></span>Hreflang-tags</td><td>Niet aangetroffen, ondanks 3 taalversies (NL/DE/FR) — risico op duplicate-content-signalen tussen taalversies</td></tr>
+    <tr><td><span class="dot dot-amber"></span>Analytics</td><td>Google Tag Manager-script aangetroffen; welke tags/doelen daarachter actief zijn kon niet van buitenaf worden geverifieerd</td></tr>
+  </table>
+
+  <div class="note-box">
+    Techniek huidige site: <b>Craft CMS</b> (via X-Powered-By-header), gehost op LiteSpeed. Dit is losstaand van
+    de nieuwe site — de nieuwe site bouwen we op de eigen standaardstack, dit is puur ter referentie.
+  </div>
+
+  <div class="page-footer"><span>Site-analyse Verblijfpark De Brem</span><span>Pagina 6</span></div>
+</div>
+
+<!-- P7 — OPENSTAANDE VRAGEN -->
+<div class="page">
+  <div class="page-header"><div class="page-meta">Site-analyse Verblijfpark De Brem<br>8 september 2026</div></div>
+  <div class="section-num">06</div>
+  <div class="section-title">Openstaande vragen voor de klant</div>
+
+  <div class="qa-item"><div class="qa-num">1</div><div class="qa-text"><b>Naam &amp; huisstijl:</b> is "Verblijfpark De Brem" de definitieve naam, en is er al een logo/kleurrichting, of stellen wij een huisstijl voor (bijv. geïnspireerd op de bremstruik — geel/groen)?</div></div>
+  <div class="qa-item"><div class="qa-num">2</div><div class="qa-text"><b>Positionering:</b> blijft de focus op tijdelijke bewoning + werknemershuisvesting, of verschuift dit naar reguliere vakantieverhuur, of allebei naast elkaar?</div></div>
+  <div class="qa-item"><div class="qa-num">3</div><div class="qa-text"><b>Parador-verwijzingen:</b> de "Terug naar Parador Parcs"-knop en footer-copyright moeten sowieso weg bij een zelfstandig merk — akkoord?</div></div>
+  <div class="qa-item"><div class="qa-num">4</div><div class="qa-text"><b>Recranet-toegang:</b> is er al een (nieuw) Recranet-account/API-toegang voor de klant, los van het Parador-contract?</div></div>
+  <div class="qa-item"><div class="qa-num">5</div><div class="qa-text"><b>Talen:</b> NL/DE/FR aanhouden, of prioriteit geven aan bijvoorbeeld alleen NL bij de eerste lancering?</div></div>
+  <div class="qa-item"><div class="qa-num">6</div><div class="qa-text"><b>Cafetaria/terras:</b> nog in gebruik? (zie inconsistentie in sectie 3)</div></div>
+  <div class="qa-item"><div class="qa-num">7</div><div class="qa-text"><b>Openingstijden/receptie:</b> niet vermeld op de huidige site — nodig voor de contactpagina.</div></div>
+  <div class="qa-item"><div class="qa-num">8</div><div class="qa-text"><b>Eigen foto's:</b> mogen de huidige parkfoto's (chalets, plattegrond, omgeving) hergebruikt worden, of komen er nieuwe foto's na de overname?</div></div>
+
+  <div class="page-footer"><span>Site-analyse Verblijfpark De Brem</span><span>Pagina 7</span></div>
+</div>
+
+<!-- P8 — VERVOLGSTAPPEN -->
+<div class="page">
+  <div class="page-header"><div class="page-meta">Site-analyse Verblijfpark De Brem<br>8 september 2026</div></div>
+  <div class="section-num">07</div>
+  <div class="section-title">Voorgestelde vervolgstappen</div>
+
+  <div class="phase"><div class="phase-num">1</div><div><div class="phase-title">Foundation</div><div class="phase-body">Nieuwe huisstijl (kleuren, typografie), design tokens, metadata-structuur — na antwoord op vraag 1.</div></div></div>
+  <div class="phase"><div class="phase-num">2</div><div><div class="phase-title">UI-systeem</div><div class="phase-body">Buttons, cards, header, footer — indeling van de huidige site als basis, in de nieuwe huisstijl.</div></div></div>
+  <div class="phase"><div class="phase-num">3</div><div><div class="phase-title">Homepage</div><div class="phase-body">Zelfde opbouw als de huidige homepage (hero + zoekbalk, USP's, introtekst, 3-koloms blok), met echte content en nieuwe visuele identiteit.</div></div></div>
+  <div class="phase"><div class="phase-num">4</div><div><div class="phase-title">Overige pagina's + Recranet</div><div class="phase-body">Tijdelijke woonruimte/accommodaties, over het park, plattegrond, faciliteiten, contact (met kaart), en de Recranet-boekingskoppeling — na antwoord op vraag 4 en het Recranet-onderzoek uit sectie 4.</div></div></div>
+  <div class="phase"><div class="phase-num">5</div><div><div class="phase-title">SEO &amp; performance</div><div class="phase-body">Meteen goed inrichten: meta descriptions, Open Graph, JSON-LD (LodgingBusiness/Campground-schema), canonical URLs, correcte hreflang tussen taalversies, sitemap.xml, alt-teksten.</div></div></div>
+
+  <div class="note-box">
+    Na iedere fase: lokale build- en linttest, review op localhost, pas daarna verder — geen wijzigingen live
+    zonder expliciete goedkeuring.
+  </div>
+
+  <div class="page-footer"><span>Site-analyse Verblijfpark De Brem</span><span>Pagina 8</span></div>
+</div>
+
+</body>
+</html>
